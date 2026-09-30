@@ -52,7 +52,9 @@ class TurnstileController extends AdminController
 
         $enabled = isset($_POST['enabled']);
         $siteKey = \trim($_POST['site_key'] ?? '');
-        $secretKey = \trim($_POST['secret_key'] ?? '');
+
+        $postedSecretKey = \trim($_POST['secret_key'] ?? '');
+        $secretKey = $postedSecretKey === '' ? (string) (TurnstileConfig::get()->secretKey ?? '') : $postedSecretKey;
 
         $mode = $_POST['mode'] ?? 'managed';
         $modeValid = \in_array($mode, ['managed', 'non-interactive', 'invisible'], true);
