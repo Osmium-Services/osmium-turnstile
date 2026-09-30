@@ -1,0 +1,57 @@
+{
+    "id": "turnstile",
+    "name": "Cloudflare Turnstile",
+    "version": "1.0.0",
+    "description": "Spam protection for forms via Cloudflare Turnstile - free, no DNS dependency, admin-editable site/secret key and widget mode",
+    "author": {
+        "name": "Gavin Cox"
+    },
+    "license": "proprietary",
+
+    "requires": {
+        "osmium": ">=1.0.0",
+        "php": ">=8.1",
+        "services": []
+    },
+
+    "autoload": [
+        "models"
+    ],
+
+    "admin": {
+        "menu": {
+            "section": "Content",
+            "items": [
+                {
+                    "id": "turnstile",
+                    "label": "Turnstile",
+                    "icon": "bx bx-shield-quarter",
+                    "route": "admin/settings/turnstile",
+                    "activePattern": "admin/settings/turnstile",
+                    "role": null
+                }
+            ]
+        },
+        "routes": {
+            "admin/settings/turnstile": {
+                "controller": "controllers/TurnstileController.php",
+                "class": "Osmium\\Services\\Turnstile\\Controllers\\TurnstileController",
+                "method": "index",
+                "title": "Cloudflare Turnstile"
+            }
+        }
+    },
+
+    "frontend": {
+        "themeBlocks": [
+            {
+                "hook": "head",
+                "file": "theme/turnstile-headscript.phtml"
+            }
+        ]
+    },
+
+    "setup": {
+        "postInstallNote": "Disabled by default. A theme must call ServiceThemeBlocks::render('head', ['turnstile' => ..., 'site' => $site]) in its <head> template to load the widget script. A form wanting protection renders <div class=\"cf-turnstile\" data-sitekey=\"...\"></div> (site key available via TurnstileConfig::get()->siteKey) and its handler calls TurnstileConfig::verify($_POST['cf-turnstile-response'] ?? '') before processing."
+    }
+}

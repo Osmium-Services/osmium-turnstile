@@ -1,0 +1,9 @@
+<?php // Included via ServiceThemeBlocks::render('head', [...]) by a real theme's own
+// <head> template. Expects $turnstile (this service's own config) and $site.
+// Loads the Turnstile API script (which auto-renders any .cf-turnstile div on
+// the page, in whatever mode the site key was created with) - nothing more.
+// A form wanting protection renders its own <div class="cf-turnstile"
+// data-sitekey="..."></div> and its handler calls TurnstileConfig::verify(). ?>
+<?php if ($turnstile['enabled'] ?? false): ?>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<?php endif; ?>

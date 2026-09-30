@@ -1,0 +1,66 @@
+<div class="d-flex justify-content-between align-items-center py-3 mb-4">
+    <h4 class="mb-0">
+        <span class="text-muted fw-light">Services /</span> Cloudflare Turnstile
+    </h4>
+    <button type="submit" form="settings-form" class="btn btn-primary">
+        <i class="bx bx-save me-1"></i> Save Settings
+    </button>
+</div>
+
+<?php if ($admin['settingsSaved']): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        Settings saved successfully!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
+<?php if ($admin['settingsError'] ?? false): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <?= \htmlspecialchars($admin['settingsError'] ?? '') ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
+<form method="POST" action="<?= $admin['basePath'] ?>settings/turnstile/" id="settings-form">
+    <input type="hidden" name="token" value="<?= $template['formToken'] ?? '' ?>">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bx bx-shield-quarter me-2"></i>Cloudflare Turnstile</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="enabled" name="enabled"
+                                <?= ($admin['config']['turnstile']['enabled'] ?? false) ? 'checked' : '' ?>>
+                            <label class="form-check-label fw-semibold" for="enabled">Enabled</label>
+                        </div>
+                        <div class="form-text">Loads the Turnstile widget script. A form must separately render a <code>.cf-turnstile</code> div and call <code>TurnstileConfig::verify()</code> to actually be protected.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="site_key" class="form-label fw-semibold">Site Key</label>
+                        <input type="text" class="form-control" id="site_key" name="site_key"
+                            value="<?= \htmlspecialchars($admin['config']['turnstile']['siteKey'] ?? '') ?>">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="secret_key" class="form-label fw-semibold">Secret Key</label>
+                        <input type="text" class="form-control" id="secret_key" name="secret_key"
+                            value="<?= \htmlspecialchars($admin['config']['turnstile']['secretKey'] ?? '') ?>">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="mode" class="form-label fw-semibold">Widget Mode</label>
+                        <select class="form-select" id="mode" name="mode">
+                            <?php foreach (['managed' => 'Managed (checkbox, usually auto-passes)', 'non-interactive' => 'Non-interactive (small badge only)', 'invisible' => 'Invisible (nothing shown)'] as $value => $label): ?>
+                                <option value="<?= $value ?>" <?= ($admin['config']['turnstile']['mode'] ?? 'managed') === $value ? 'selected' : '' ?>><?= $label ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
