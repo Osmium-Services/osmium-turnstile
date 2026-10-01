@@ -1,8 +1,9 @@
 {
     "id": "turnstile",
     "name": "Cloudflare Turnstile",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Spam protection for forms via Cloudflare Turnstile - free, no DNS dependency, admin-editable site/secret key and widget mode",
+    "category": "security-privacy",
     "author": {
         "name": "Gavin Cox"
     },
