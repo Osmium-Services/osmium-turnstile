@@ -1,7 +1,7 @@
 {
     "id": "turnstile",
     "name": "Cloudflare Turnstile",
-    "version": "1.0.3",
+    "version": "1.1.0",
     "description": "Spam protection for forms via Cloudflare Turnstile - free, no DNS dependency, admin-editable site/secret key and widget mode",
     "category": "security-privacy",
     "author": {
@@ -22,6 +22,17 @@
     "csp": {
         "script-src": ["https://challenges.cloudflare.com"],
         "frame-src": ["https://challenges.cloudflare.com"]
+    },
+
+    "migrations": "migrations/",
+
+    "hooks": {
+        "form.verify": [
+            "Osmium\\Services\\Turnstile\\Models\\TurnstileHooks::verify"
+        ],
+        "form.widget": [
+            "Osmium\\Services\\Turnstile\\Models\\TurnstileHooks::widget"
+        ]
     },
 
     "admin": {
@@ -58,6 +69,6 @@
     },
 
     "setup": {
-        "postInstallNote": "Disabled by default. A theme must call ServiceThemeBlocks::render('head', ['turnstile' => ..., 'site' => $site]) in its <head> template to load the widget script. A form wanting protection renders <div class=\"cf-turnstile\" data-sitekey=\"...\"></div> (site key available via TurnstileConfig::get()->siteKey) and its handler calls TurnstileConfig::verify($_POST['cf-turnstile-response'] ?? '') before processing."
+        "postInstallNote": "Disabled by default. Once enabled with the keys from Cloudflare, every form that fires the form.verify and form.widget hooks (such as the product review form) is protected, with no per-form setup. A theme must echo $template['serviceHeadHtml'] in its <head> so the widget script loads. Other forms can call TurnstileConfig::verify($_POST['cf-turnstile-response'] ?? '') directly. The Turnstile settings page shows how many checks passed and failed."
     }
 }

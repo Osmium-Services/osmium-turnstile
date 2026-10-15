@@ -6,6 +6,7 @@ namespace Osmium\Services\Turnstile\Controllers;
 
 use Osmium\Modules\Admin\Core\AdminController;
 use Osmium\Services\Turnstile\Models\TurnstileConfig;
+use Osmium\Services\Turnstile\Models\TurnstileStats;
 
 /**
  * Cloudflare Turnstile settings controller - full-page form POST/redirect,
@@ -35,11 +36,28 @@ class TurnstileController extends AdminController
         if ($isPost) $this->handleSubmit();
 
         $this->data['admin']['config']['turnstile'] = (array) TurnstileConfig::get();
+        $this->data['admin']['checkSummary'] = $this->checkSummary();
         $this->data['admin']['settingsSaved'] = $_SESSION['turnstile_settings_saved'] ?? false;
         $this->data['admin']['settingsError'] = $_SESSION['turnstile_settings_error'] ?? false;
         unset($_SESSION['turnstile_settings_saved'], $_SESSION['turnstile_settings_error']);
 
         $this->setView('turnstile/index.phtml');
+    }
+
+    /** @return array<string, array<string, int>> the last 30 days of checks: form => outcome => count */
+    private function checkSummary(): array
+    {
+        $summary = [];
+
+        try {
+            $stats = new TurnstileStats($this->osmium->dataSource);
+            $stats->purgeOld();
+            foreach ($stats->summary(30) as $row) $summary[$row['form']][$row['outcome']] = (int) $row['total'];
+        } catch (\Throwable $e) {
+            \error_log('Turnstile stats unavailable: ' . $e->getMessage());
+        }
+
+        return $summary;
     }
 
     private function handleSubmit(): void

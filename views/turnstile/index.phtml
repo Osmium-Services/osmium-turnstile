@@ -36,7 +36,7 @@
                                 <?= ($admin['config']['turnstile']['enabled'] ?? false) ? 'checked' : '' ?>>
                             <label class="form-check-label fw-semibold" for="enabled">Enabled</label>
                         </div>
-                        <div class="form-text">Loads the Turnstile widget script. A form must separately render a <code>.cf-turnstile</code> div and call <code>TurnstileConfig::verify()</code> to actually be protected.</div>
+                        <div class="form-text">Loads the Turnstile widget script and protects every form that uses the <code>form.verify</code> and <code>form.widget</code> hooks, such as the product review form. Only a form that fails the check is refused: if Cloudflare cannot be reached, the form falls back on its own checks.</div>
                     </div>
 
                     <div class="mb-3">
@@ -64,3 +64,36 @@
         </div>
     </div>
 </form>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bx bx-bar-chart-alt-2 me-2"></i>Checks in the last 30 days</h5>
+            </div>
+            <div class="card-body">
+                <?php if (empty($admin['checkSummary'])): ?>
+                    <p class="text-muted mb-0">No checks yet. They appear here once a protected form is submitted.</p>
+                <?php else: ?>
+                    <table class="table table-sm mb-2">
+                        <thead>
+                            <tr><th>Form</th><th>Passed</th><th>Failed</th><th>No token</th><th>Cloudflare unreachable</th></tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($admin['checkSummary'] as $form => $counts): ?>
+                                <tr>
+                                    <td><?= \htmlspecialchars((string) $form) ?></td>
+                                    <td><?= (int) ($counts['passed'] ?? 0) ?></td>
+                                    <td><?= (int) ($counts['failed'] ?? 0) ?></td>
+                                    <td><?= (int) ($counts['missing'] ?? 0) ?></td>
+                                    <td><?= (int) ($counts['unreachable'] ?? 0) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    <div class="form-text">Passed should rise with real submissions. Failed and No token are blocked bots. Many "No token" results from real visitors mean the widget is not loading; any "unreachable" or failures with a Cloudflare error code are also in the error log.</div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
