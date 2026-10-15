@@ -28,7 +28,8 @@ class TurnstileHooks
     }
 
     /**
-     * form.widget: the div Cloudflare's script turns into the widget, or null when this service is off.
+     * form.widget: the Turnstile widget for the form (it holds the submit buttons until Cloudflare has answered), or
+     * null when this service is off.
      *
      * @param array{form: string} $payload
      */
@@ -38,7 +39,10 @@ class TurnstileHooks
         $notUsable = !($config->enabled ?? false) || empty($config->siteKey ?? '');
         if ($notUsable) return null;
 
-        return '<div class="cf-turnstile" data-sitekey="' . \htmlspecialchars((string) $config->siteKey, ENT_QUOTES) . '"></div>';
+        static $count = 0;
+        $count++;
+
+        return TurnstileWidget::html(siteKey: (string) $config->siteKey, callbackId: \preg_replace('/[^A-Za-z0-9]/', '', (string) ($payload['form'] ?? '')) . $count, nonce: \Osmium\Core\OsmiumSecurity::requestNonce());
     }
 
     /** Counting must never stop a visitor's form */
