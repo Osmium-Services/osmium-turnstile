@@ -7,7 +7,10 @@ namespace Osmium\Services\Turnstile\Models;
 /**
  * The markup a form gets for its Turnstile widget. Pure: no config, no request.
  *
- * With the invisible widget the token only exists a moment after the page loads, and a form posted before then is
+ * The Cloudflare script is loaded by the widget itself, only when the form is near the screen or touched, so a page
+ * with no form (or a form nobody reaches) never contacts Cloudflare and gets none of its cookies.
+ *
+ * With the invisible widget the token only exists a moment after the script loads, and a form posted before then is
  * refused for having no token. So the form's submit buttons wait until Turnstile has the token, and are released
  * after a few seconds regardless (an ad blocker or an outage must not trap the visitor: the form's own checks
  * still apply).
@@ -34,6 +37,7 @@ class TurnstileWidget
     var form = widget ? widget.closest('form') : null;
     if (!form) return;
     var answered = false;
+    var loadStarted = false;
     function set(waiting) { // The buttons are looked up each time: this runs before the form's own buttons are parsed
         var buttons = form.querySelectorAll('[type="submit"]');
         for (var i = 0; i < buttons.length; i++) {
@@ -45,8 +49,30 @@ class TurnstileWidget
     window.turnstileDone{$id} = function () { answered = true; set(false); }; // A token (or an error: the form's own checks then decide)
     window.turnstileWait{$id} = function () { set(true); }; // The token expired and is being renewed
     function hold() { if (!answered) set(true); }
+    function load() { // Cloudflare is not contacted (so sets no cookies) until the form is near the screen or touched
+        if (loadStarted) return;
+        loadStarted = true;
+        setTimeout(function () { answered = true; set(false); }, {$release});
+        if (window.osmiumTurnstileRequested) return; // Another form on this page already asked for the script
+        window.osmiumTurnstileRequested = true;
+        var script = document.createElement('script');
+        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+        script.async = true;
+        script.defer = true;
+        script.nonce = '{$nonce}';
+        document.head.appendChild(script);
+    }
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries, observer) {
+            if (entries[0].isIntersecting) { observer.disconnect(); load(); }
+        }, {rootMargin: '400px'}).observe(widget);
+    } else {
+        load();
+    }
+    form.addEventListener('focusin', load, {once: true});
+    form.addEventListener('pointerdown', load, {once: true});
+    form.addEventListener('touchstart', load, {once: true, passive: true});
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hold); else hold();
-    setTimeout(function () { answered = true; set(false); }, {$release});
 })();
 </script>
 HTML;

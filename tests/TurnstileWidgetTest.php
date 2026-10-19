@@ -55,6 +55,36 @@ final class TurnstileWidgetTest extends TestCase
         $this->assertStringContainsString('}, ' . TurnstileWidget::RELEASE_AFTER_MS . ');', $this->html());
     }
 
+    public function test_cloudflare_is_not_contacted_until_the_form_is_near_the_screen_or_touched(): void
+    {
+        $html = $this->html();
+
+        $this->assertStringNotContainsString('<script src=', $html, 'no script tag that loads at once');
+        $this->assertStringContainsString("script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'", $html);
+        $this->assertStringContainsString("rootMargin: '400px'", $html);
+        $this->assertStringContainsString("form.addEventListener('focusin', load", $html);
+        $this->assertStringContainsString("form.addEventListener('pointerdown', load", $html);
+        $this->assertStringContainsString("form.addEventListener('touchstart', load", $html);
+    }
+
+    public function test_the_script_is_added_once_per_page_and_carries_the_nonce(): void
+    {
+        $html = $this->html();
+
+        $this->assertStringContainsString('window.osmiumTurnstileRequested', $html);
+        $this->assertStringContainsString("script.nonce = 'abc123'", $html);
+    }
+
+    public function test_the_release_timer_starts_when_loading_starts_not_when_the_page_loads(): void
+    {
+        $html = $this->html();
+        $timer = \strpos($html, '}, ' . TurnstileWidget::RELEASE_AFTER_MS . ');');
+
+        $this->assertNotFalse($timer);
+        $this->assertGreaterThan(\strpos($html, 'function load()'), $timer, 'the timer is inside load()');
+        $this->assertLessThan(\strpos($html, 'if (document.readyState'), $timer, 'and not started at page load');
+    }
+
     public function test_two_forms_get_their_own_callbacks(): void
     {
         $this->assertStringContainsString('turnstileDoneother2', $this->html(['callbackId' => 'other2']));
