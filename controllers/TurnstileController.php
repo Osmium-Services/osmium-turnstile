@@ -24,8 +24,7 @@ class TurnstileController extends AdminController
             "turnstile": {
                 "enabled": false,
                 "siteKey": "",
-                "secretKey": "",
-                "mode": "managed"
+                "secretKey": ""
             }
         }
         JSON;
@@ -74,11 +73,7 @@ class TurnstileController extends AdminController
         $postedSecretKey = \trim($_POST['secret_key'] ?? '');
         $secretKey = $postedSecretKey === '' ? (string) (TurnstileConfig::get()->secretKey ?? '') : $postedSecretKey;
 
-        $mode = $_POST['mode'] ?? 'managed';
-        $modeValid = \in_array($mode, ['managed', 'non-interactive', 'invisible'], true);
-        if (!$modeValid) $mode = 'managed';
-
-        $this->saveConfig($enabled, $siteKey, $secretKey, $mode);
+        $this->saveConfig($enabled, $siteKey, $secretKey);
 
         $this->admin->model->changelog->log(
             description: 'Updated Turnstile settings',
@@ -91,7 +86,7 @@ class TurnstileController extends AdminController
         $this->redirect('settings/turnstile/');
     }
 
-    private function saveConfig(bool $enabled, string $siteKey, string $secretKey, string $mode): void
+    private function saveConfig(bool $enabled, string $siteKey, string $secretKey): void
     {
         $configExists = \file_exists(self::CONFIG_FILE_PATH);
         if (!$configExists) $this->ensureConfigDirectoryExists();
@@ -101,7 +96,6 @@ class TurnstileController extends AdminController
                 'enabled' => $enabled,
                 'siteKey' => $siteKey,
                 'secretKey' => $secretKey,
-                'mode' => $mode,
             ]],
             flags: JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
         );

@@ -115,7 +115,6 @@ class TurnstileConfig
             'enabled' => false,
             'siteKey' => '',
             'secretKey' => '',
-            'mode' => 'managed', // managed | non-interactive | invisible
         ];
     }
 }

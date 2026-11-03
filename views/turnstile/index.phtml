@@ -51,14 +51,7 @@
                             placeholder="<?= !empty($admin['config']['turnstile']['secretKey'] ?? '') ? 'Leave blank to keep current' : '' ?>">
                     </div>
 
-                    <div class="mb-3">
-                        <label for="mode" class="form-label fw-semibold">Widget Mode</label>
-                        <select class="form-select" id="mode" name="mode">
-                            <?php foreach (['managed' => 'Managed (checkbox, usually auto-passes)', 'non-interactive' => 'Non-interactive (small badge only)', 'invisible' => 'Invisible (nothing shown)'] as $value => $label): ?>
-                                <option value="<?= $value ?>" <?= ($admin['config']['turnstile']['mode'] ?? 'managed') === $value ? 'selected' : '' ?>><?= $label ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                    <p class="form-text mb-0">How the widget looks (a checkbox box, a small badge or nothing at all) is set on the widget in the Cloudflare dashboard, not here.</p>
                 </div>
             </div>
         </div>

@@ -1,8 +1,8 @@
 {
     "id": "turnstile",
     "name": "Cloudflare Turnstile",
-    "version": "1.2.3",
-    "description": "Spam protection for forms via Cloudflare Turnstile - free, no DNS dependency, admin-editable site/secret key and widget mode",
+    "version": "1.2.4",
+    "description": "Spam protection for forms via Cloudflare Turnstile - free, no DNS dependency, admin-editable site and secret key",
     "category": "security-privacy",
     "website": "https://www.cloudflare.com/application-services/products/turnstile/",
     "account": {"required": "free"},
