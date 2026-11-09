@@ -73,6 +73,12 @@ class TurnstileController extends AdminController
         $postedSecretKey = \trim($_POST['secret_key'] ?? '');
         $secretKey = $postedSecretKey === '' ? (string) (TurnstileConfig::get()->secretKey ?? '') : $postedSecretKey;
 
+        $enabledWithoutSecret = $enabled && $secretKey === '';
+        if ($enabledWithoutSecret) {
+            $_SESSION['turnstile_settings_error'] = 'Enter the secret key before switching Turnstile on, otherwise forms would not be protected.';
+            $this->redirect('settings/turnstile/');
+        }
+
         $this->saveConfig($enabled, $siteKey, $secretKey);
 
         $this->admin->model->changelog->log(
