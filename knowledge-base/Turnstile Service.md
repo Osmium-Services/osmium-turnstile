@@ -1,7 +1,7 @@
 # Turnstile service
 
 Cloudflare Turnstile as the site's bot protection for public forms (repo `Osmium-Services/osmium-turnstile`,
-v1.1.1<!--v:turnstile-->, category security-privacy). Turnstile is a form widget only: no Cloudflare proxy, CDN or DNS change.
+v1.2.4<!--v:turnstile-->, category security-privacy). Turnstile is a form widget only: no Cloudflare proxy, CDN or DNS change.
 Settings are under Content > Turnstile; keys live in `app/config/services/turnstile.json.php`, which updates leave alone.
 Part of [[Service Catalogue]].
 
