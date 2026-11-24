@@ -1,6 +1,7 @@
 ---
 title: Protect your forms from spam bots
 tags: turnstile, cloudflare, spam, bots, captcha, form, site key, secret key
+page: admin/settings/turnstile
 ---
 
 **Cloudflare Turnstile** checks that a form is being filled in by a person, without asking visitors to solve puzzles.
